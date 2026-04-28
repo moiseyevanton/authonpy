@@ -30,20 +30,32 @@ Backend-сервис на Python с REST API, системой авториза�
 ## 📁 Структура проекта
 
 ```
-authonpy/
+auth_service/
 │
-├── main.py             
-├── db.py             
-├── models.py              
-├── schemas.py            
-├── auth.py                        
+├── main.py                  # Точка входа FastAPI + seed_default_employer
 │
+├── api/
+│   └── api.py               # Роутер: /login, /me, /register/administrator, /register/worker
 │
-├── docker-compose.yml   # Поднимает API + PostgreSQL
-├── Dockerfile           # Сборка backend контейнера
+├── db/
+│   └── db.py                # Подключение к БД, engine, SessionLocal, get_db
 │
-├── requirements.txt     # Python зависимости
-├── .env                 # Переменные окружения
+├── models/
+│   └── models.py            # SQLAlchemy модели (Employer, Administrator, Worker, Store)
+│
+├── schemas/
+│   └── schemas.py           # Pydantic схемы
+│
+├── jwt/
+│   └── jwt.py               # Хэширование паролей, создание/проверка JWT, get_current_user
+│
+├── docker-compose.yml       # Поднимает API (fastapi_app) + PostgreSQL (postgres_db)
+├── Dockerfile               # Сборка backend контейнера
+│
+├── adminmetrics.sql         # Файл с таблитаци базы данных на SQL
+│
+├── requirements.txt         # Python зависимости
+├── .env                     # Переменные окружения (SECRET_KEY, DB_USER, DB_PASS...)
 ├── .gitignore
 └── README.md
 ```
@@ -59,9 +71,12 @@ POST /register/administrator
 
 ```json
 {
-  "full_name": "string",
+  "username": "string",
+  "first_name": "string",
+  "last_name": "string",
   "password": "string",
-  "ID_employer": 0
+  "ID_employer": 0,
+  "ip_address": "string"
 }
 ```
 
@@ -73,10 +88,13 @@ POST /register/worker
 
 ```json
 {
-  "full_name": "string",
+  "username": "string",
+  "first_name": "string",
+  "last_name": "string",
   "password": "string",
   "ID_store": 0,
-  "ID_administrator": 0
+  "ID_administrator": 0,
+  "ip_address": "string"
 }
 ```
 
@@ -85,9 +103,14 @@ POST /register/worker
 ### Логин
 
 ```
+POST /login
+```
+
+```
 {
-  "full_name": "string",
-  "password": "string"
+  "username": "string",
+  "password": "string",
+  "ip_address": "string"
 }
 ```
 
@@ -100,7 +123,9 @@ GET /auth/me
 
 ```json
 {
-  "full_name": "string",
+  "username": "string",
+  "first_name": "string",
+  "last_name": "string",
   "role": "string",
   "additional_info": {}
 }
@@ -144,6 +169,12 @@ docker-compose down -v
 docker exec -it postgres_db psql -U postgres
 ```
 
+
+Подключения из контейнера:
+```bash
+psql -U app_user -d app_db
+```
+
 ---
 
 ### SQL команды
@@ -181,6 +212,8 @@ DB_HOST=db
 DB_PORT=5432
 
 SECRET_KEY=super_secret_key
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_HOURS = 24
 ```
 
 ---
@@ -195,8 +228,11 @@ http://localhost:8000/docs
 
 ## 🧠 Архитектура
 
-Client → API → Routes → Services → Models → PostgreSQL
-
+Client → API (FastAPI) → Routes (api/api.py) → Models (SQLAlchemy) → PostgreSQL
+                                                  ↑
+                                            jwt.py (хэши, токены)
+                                                  ↑
+                                            schemas.py (Pydantic)
 ---
 
 ## ⭐ Автор

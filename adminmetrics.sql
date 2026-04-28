@@ -1,6 +1,8 @@
 CREATE TABLE Employers (
     ID_employer SERIAL PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL
 );
 
@@ -23,7 +25,9 @@ ON Stores(ID_employer);
 
 CREATE TABLE Administrators (
     ID_administrator SERIAL PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     ID_employer INTEGER NOT NULL,
 
@@ -39,7 +43,9 @@ ON Administrators(ID_employer);
 
 CREATE TABLE Workers (
     ID_worker SERIAL PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     ID_store INTEGER NOT NULL,
     ID_administrator INTEGER,
@@ -82,3 +88,36 @@ ON Administrator_Store(ID_administrator);
 
 CREATE INDEX idx_admin_store_store
 ON Administrator_Store(ID_store);
+
+
+CREATE TABLE UserIPs (
+    ID_ip SERIAL PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL,
+    login_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    -- Кто именно заходил (одна из трёх ролей)
+    ID_employer INTEGER,
+    ID_administrator INTEGER,
+    ID_worker INTEGER,
+
+    FOREIGN KEY (ID_employer) REFERENCES Employers(ID_employer)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    FOREIGN KEY (ID_administrator) REFERENCES Administrators(ID_administrator)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    FOREIGN KEY (ID_worker) REFERENCES Workers(ID_worker)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    -- Только один из трёх ID должен быть заполнен
+    CONSTRAINT chk_one_user CHECK (
+        (ID_employer IS NOT NULL AND ID_administrator IS NULL AND ID_worker IS NULL) OR
+        (ID_employer IS NULL AND ID_administrator IS NOT NULL AND ID_worker IS NULL) OR
+        (ID_employer IS NULL AND ID_administrator IS NULL AND ID_worker IS NOT NULL)
+    )
+);
+
+CREATE INDEX idx_user_ips_employer ON UserIPs(ID_employer);
+CREATE INDEX idx_user_ips_administrator ON UserIPs(ID_administrator);
+CREATE INDEX idx_user_ips_worker ON UserIPs(ID_worker);
+CREATE INDEX idx_user_ips_time ON UserIPs(login_time);

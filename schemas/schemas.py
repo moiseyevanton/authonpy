@@ -4,18 +4,29 @@ from typing import Optional
 
 # --- Запрос на авторизацию ---
 class UserLogin(BaseModel):
-    full_name: str
+    username: str
     password: str
+    ip_address: str
 
 
 # --- Запросы на регистрацию ---
-class AdministratorRegister(UserLogin):
+class AdministratorRegister(BaseModel):
+    username: str
+    first_name: str
+    last_name: str
+    password: str
     ID_employer: int
+    ip_address: str
 
 
-class WorkerRegister(UserLogin):
+class WorkerRegister(BaseModel):
+    username: str
+    first_name: str
+    last_name: str
+    password: str
     ID_store: int
     ID_administrator: Optional[int] = None
+    ip_address: str
 
 
 # --- Ответ с токеном ---
@@ -28,6 +39,8 @@ class TokenResponse(BaseModel):
 
 # --- Профиль пользователя (для /me) ---
 class UserProfile(BaseModel):
-    full_name: str
+    username: str
+    first_name: str
+    last_name: str
     role: str
     additional_info: Optional[dict] = {}

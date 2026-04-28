@@ -24,7 +24,7 @@ def seed_default_employer():
         db.close()
 
 
-@app.post("/register/administrator", response_model=schemas.TokenResponse)
+@app.post("/register/administrator", summary="Регистрация администратора", response_model=schemas.TokenResponse)
 def register_admin(
     admin: schemas.AdministratorRegister,
     db: Session = Depends(get_db)
@@ -63,7 +63,7 @@ def register_admin(
     }
 
 
-@app.post("/register/worker", response_model=schemas.TokenResponse)
+@app.post("/register/worker", summary="Регистрация работника", response_model=schemas.TokenResponse)
 def register_worker(
     worker: schemas.WorkerRegister,
     db: Session = Depends(get_db)
@@ -111,7 +111,7 @@ def register_worker(
     }
 
 
-@app.post("/login", response_model=schemas.TokenResponse)
+@app.post("/login", summary="Авторизация", response_model=schemas.TokenResponse)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     # Последовательный поиск по всем таблицам
     employer = db.query(models.Employer).filter(models.Employer.full_name == user.full_name).first()

@@ -67,7 +67,6 @@ POST /register/administrator
 
 ---
 
-### Логин
 ```
 POST /register/worker
 ```
@@ -78,6 +77,14 @@ POST /register/worker
   "password": "string",
   "ID_store": 0,
   "ID_administrator": 0
+}
+```
+### Логин
+
+```
+{
+  "full_name": "string",
+  "password": "string"
 }
 ```
 

@@ -228,11 +228,7 @@ http://localhost:8000/docs
 
 ## 🧠 Архитектура
 
-Client → API (FastAPI) → Routes (api/api.py) → Models (SQLAlchemy) → PostgreSQL
-                                                  ↑
-                                            jwt.py (хэши, токены)
-                                                  ↑
-                                            schemas.py (Pydantic)
+Client → FastAPI → Router → Pydantic (валидация) / JWT (токены) → SQLAlchemy (модели) → PostgreSQL
 ---
 
 ## ⭐ Автор

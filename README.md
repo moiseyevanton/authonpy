@@ -79,6 +79,9 @@ POST /register/worker
   "ID_administrator": 0
 }
 ```
+
+---
+
 ### Логин
 
 ```
